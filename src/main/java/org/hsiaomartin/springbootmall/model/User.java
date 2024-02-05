@@ -13,9 +13,11 @@ public class User {
 
     private Integer userId;
 
+    // 設定返回的 Json 時此屬性名稱
     @JsonProperty("e_mail")
     private String email;
 
+    // 返回 Json 時會忽略此屬性
     @JsonIgnore
     private String password;
 
