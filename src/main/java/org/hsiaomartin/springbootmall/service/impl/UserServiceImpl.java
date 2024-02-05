@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
         // 使用 MD5 生成密碼的雜湊值
         String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+
         userRegisterRequest.setPassword(hashedPassword);
 
         //創建帳號
