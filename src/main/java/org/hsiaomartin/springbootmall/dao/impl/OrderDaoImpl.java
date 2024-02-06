@@ -44,22 +44,38 @@ public class OrderDaoImpl implements OrderDao {
     @Override
     public void createOrderItems(Integer orderId, List<OrderItem> orderItemList) {
 
-        // 使用 for loop 一條一條加入數據，效率較低
-        for(OrderItem orderItem : orderItemList) {
+//        // 使用 for loop 一條一條加入數據
+//        for(OrderItem orderItem : orderItemList) {
+//
+//            String sql = "INSERT INTO order_item(order_id, product_id, quantity, amount)" +
+//                    " VALUES(:orderId, :productId, :quantity, :amount)";
+//
+//            Map<String, Object> map = new HashMap<>();
+//            map.put("orderId", orderId);
+//            map.put("productId", orderItem.getProductId());
+//            map.put("quantity", orderItem.getQuantity());
+//            map.put("amount", orderItem.getAmount());
+//
+//            namedParameterJdbcTemplate.update(sql, map);
+//        }
 
-            String sql = "INSERT INTO order_item(order_id, product_id, quantity, amount)" +
-                    " VALUES(:orderId, :productId, :quantity, :amount)";
+        // 使用 batchUpdate 一次性加入數據
+        String sql = "INSERT INTO order_item(order_id, product_id, quantity, amount)" +
+                " VALUES(:orderId, :productId, :quantity, :amount)";
 
-            Map<String, Object> map = new HashMap<>();
-            map.put("orderId", orderId);
-            map.put("productId", orderItem.getProductId());
-            map.put("quantity", orderItem.getQuantity());
-            map.put("amount", orderItem.getAmount());
+        MapSqlParameterSource[] parameterSources = new MapSqlParameterSource[orderItemList.size()];
 
-            namedParameterJdbcTemplate.update(sql, map);
+        for(int i = 0; i<orderItemList.size(); i++) {
+
+            OrderItem orderItem = orderItemList.get(i);
+
+            parameterSources[i] = new MapSqlParameterSource();
+            parameterSources[i].addValue("orderId", orderId);
+            parameterSources[i].addValue("productId", orderItem.getProductId());
+            parameterSources[i].addValue("quantity", orderItem.getQuantity());
+            parameterSources[i].addValue("amount", orderItem.getAmount());
         }
 
-        // 使用 batchUpdate 一次性加入數據，效率較高
-
+        namedParameterJdbcTemplate.batchUpdate(sql, parameterSources);
     }
 }
