@@ -1,1 +1,1 @@
-### springboot-mall practice
+### simple springboot-mall
