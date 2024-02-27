@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoginPage</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<section>
+
+  <div class="form-box">
+
+    <div class="form-value">
+      <form id="login_form">
+
+        <h2><ion-icon name="log-in-outline"></ion-icon></h2>
+        <h2>登入</h2>
+        <div class="input-box">
+          <ion-icon name="person-outline"></ion-icon>
+          <input type="text" id="email" required>
+          <label>郵 箱</label>
+        </div>
+        <div class="input-box">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input type="password" id="password" required>
+          <label>密 碼</label>
+        </div>
+
+        <button type="button" onclick="submitJson()">登 入</button>
+
+      </form>
+    </div>
+
+  </div>
+
+</section>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+  // 按下Enter執行
+  document.addEventListener('keydown', function(event) {
+    // 按下 Enter 鍵，執行登入函數
+    if (event.key === 'Enter') {
+      submitJson();
+    }
+  });
+
+  function submitJson() {
+
+    // 檢查郵箱格式
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(document.getElementById('email').value)) {
+      alert("請輸入有效的郵箱地址");
+      $('#password').val('');
+      return;
+    }
+
+    // 欲傳送數據
+    var formData = {
+      email: $('#email').val(),
+      password: $('#password').val()
+    };
+
+    $.ajax({
+      type: 'POST',
+      url: '/users/login',
+      contentType: 'application/json',
+      data: JSON.stringify(formData),
+      success: function(response) {
+        // 處理成功回應
+        window.location.href = '/indexPage?limit=6&offset=0'; // 想要跳轉的頁面 URL
+      },
+      error: function(xhr, status, error) {
+        // 處理錯誤
+        alert("帳號或密碼錯誤");
+        $('#password').val('');
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
