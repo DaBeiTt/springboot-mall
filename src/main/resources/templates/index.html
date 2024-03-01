@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- 導入 bootstrap 5 -->
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <title>Products</title>
+    <style>
+        #null-container {
+            display: flex; /* 使用 flexbox 布局 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            height: 70vh; /* 设置容器高度为视口高度，以使容器充满整个视口 */
+        }
+
+        #null-centered-content {
+            text-align: center; /* 文字居中 */
+            max-width: 800px; /* 设置内容最大宽度 */
+        }
+    </style>
+</head>
+<body>
+<header class="p-3 bg-dark text-white">
+    <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <ion-icon name="flag-outline"></ion-icon>
+            </a>
+
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li>&ensp;</li>
+                <li><a href="/" class="nav-link px-2 text-secondary">首頁</a></li>
+                <li><a href="/products" class="nav-link px-2 text-white">產品</a></li>
+            </ul>
+
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                    商品分類
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="/products?category=CAR">汽車</a></li>
+                    <li><a class="dropdown-item" href="/products?category=FOOD">食物</a></li>
+                    <li><a class="dropdown-item" href="/products?category=E_BOOK">電子書</a></li>
+                </ul>
+            </div>
+
+            <div>&ensp;</div>
+
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    商品排序
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="/products?orderBy=created_date">依最新排序</a></li>
+                    <li><a class="dropdown-item" href="/products?orderBy=price">依價格排序</a></li>
+                    <li><a class="dropdown-item" href="/products?orderBy=product_name">依名稱排序</a></li>
+                </ul>
+            </div>
+
+            <div>&ensp;</div>
+
+            <form id="searchForm" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+                <input id="searchInput" type="search" class="form-control form-control-dark" placeholder="搜尋…" aria-label="Search">
+            </form>
+
+            <div th:if="${loginUser == null}" class="text-end">
+                <a href="/loginPage"><button type="button" class="btn btn-outline-light me-2">登入</button></a>
+                <a href="/registerPage"><button type="button" class="btn btn-warning">註冊</button></a>
+            </div>
+
+            <div th:unless="${loginUser == null}" class="text-end">
+                <p th:text="'Hi, ' + ${loginUser.email}"></p>
+                <a href="/products"><button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button></a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="b-example-divider"></div>
+<div class="container">
+    <!--  -->
+    <div class="container p-3">
+        <div class="row">
+
+            <div th:each="i:${productPage.getResults()}" class="col" STYLE="display: flex; justify-content: center; align-items: center;">
+                <div class="card" style="width: 25rem; height: 100%">
+                    <img th:src="${i.imageUrl}" style="height: 250px" class="card-img-top" alt="...">
+                    <div class="card-body" style="display: flex; flex-direction: column;">
+                        <h5 th:text="${i.productName}" class="card-title"></h5>
+                        <p th:text="'售價：' + ${i.price}" class="card-text"></p>
+                        <p th:text="'剩餘數量：' + ${i.stock}" class="card-text"></p>
+                        <div th:if="${i.description != null}"><p th:text="'描述：' + ${i.description}" class="card-text"></p><br></div>
+                        <a th:if="${loginUser == null}" th:href="@{/loginPage}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
+                        <a th:unless="${loginUser == null}" th:href="@{/#}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="null-container" th:if="${productPage.results.size() == 0}">
+
+                    <div id="null-centered-content">
+                        <h1><ion-icon name="sad-outline"></ion-icon>找不到符合的產品資訊</h1>
+                    </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<div th:if="${productPage.results.size() != 0}">
+    <br>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li th:if="${productPage.getOffset() != 0}" class="page-item">
+                <a th:if="${category == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} }">上一頁</a>
+                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&category=' + ${category}}">上一頁</a>
+                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&orderBy=' + ${orderBy}}">上一頁</a>
+            </li>
+            </li>
+            <li>&ensp;</li>
+            <li th:if="${productPage.getOffset()+6 < productPage.getTotal()}" class="page-item">
+                <a th:if="${category == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} }">下一頁</a>
+                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&category=' + ${category}}">下一頁</a>
+                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&orderBy=' + ${orderBy}}">下一頁</a>
+            </li>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+<div class="container">
+    <footer class="py-3 my-4">
+        <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+            <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
+            <li class="nav-item"><a href="/products" class="nav-link px-2 text-muted">Product</a></li>
+        </ul>
+        <p class="text-center text-muted">© 2024 Company, Spring Boot Demo Mall</p>
+    </footer>
+</div>
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+<script>
+    function confirmAction() {
+        // 使用 confirm() 方法彈出確認對話框
+        var result = confirm("確定要登出嗎？");
+
+        // 檢查用戶的選擇
+        if (result) {
+            alert("已登出！");
+        } else {
+            history.back();
+        }
+    }
+
+    // 搜尋框
+    document.getElementById('searchForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        var searchValue = document.getElementById('searchInput').value;
+        var searchUrl = '/products?search=' + encodeURIComponent(searchValue); //建構完整的URL
+
+        window.location.href = searchUrl;
+    });
+</script>
+
+</body>
+</html>

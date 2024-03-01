@@ -1,5 +1,6 @@
 package org.hsiaomartin.springbootmall.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.hsiaomartin.springbootmall.constant.ProductCategory;
@@ -17,6 +18,10 @@ public class Product {
     private Integer price;
     private Integer stock;
     private String description;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastModifiedDate;
 }

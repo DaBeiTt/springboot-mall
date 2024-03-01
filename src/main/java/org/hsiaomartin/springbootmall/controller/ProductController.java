@@ -12,20 +12,22 @@ import org.hsiaomartin.springbootmall.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @Validated
-@RestController
+@Controller
 public class ProductController {
 
     @Autowired
     private ProductService productService;
 
     @GetMapping("/products")
-    public ResponseEntity<Page<Product>> getProducts(
+    public String getProducts(
             // 查詢條件 Filtering
             @RequestParam(required = false) ProductCategory category,
             @RequestParam(required = false) String search,
@@ -35,8 +37,10 @@ public class ProductController {
             @RequestParam(defaultValue = "desc") String sort,
 
             // 分頁 Pagination
-            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "0") @Min(0) Integer offset
+            @RequestParam(defaultValue = "6") @Max(1000) @Min(0) Integer limit,
+            @RequestParam(defaultValue = "0") @Min(0) Integer offset,
+
+            Model model
     ) {
 
         ProductQueryParams productQueryParams = new ProductQueryParams();
@@ -60,7 +64,11 @@ public class ProductController {
         page.setTotal(total);
         page.setResults(productList);
 
-        return ResponseEntity.status(HttpStatus.OK).body(page);
+        model.addAttribute("productPage", page);
+        if (category != null) model.addAttribute("category", category);
+        model.addAttribute("orderBy", orderBy);
+
+        return "index";
     }
 
     // CRUD
