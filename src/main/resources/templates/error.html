@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ERROR</title>
+    <style>
+        p{
+            font-size: 50px;
+            color: red;
+        }
+        a{
+            font-size: 20px;
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<div style="text-align: center">
+    <p th:text="${errorMessage}"></p>
+    <a href="#" onclick="history.back();">返回</a>
+</div>
+</body>
+</html>

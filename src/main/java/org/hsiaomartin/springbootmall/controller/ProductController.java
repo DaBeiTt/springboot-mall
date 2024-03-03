@@ -1,11 +1,13 @@
 package org.hsiaomartin.springbootmall.controller;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.hsiaomartin.springbootmall.constant.ProductCategory;
 import org.hsiaomartin.springbootmall.dto.ProductQueryParams;
 import org.hsiaomartin.springbootmall.dto.ProductRequest;
+import org.hsiaomartin.springbootmall.dto.UserLoginRequest;
 import org.hsiaomartin.springbootmall.model.Product;
 import org.hsiaomartin.springbootmall.service.ProductService;
 import org.hsiaomartin.springbootmall.util.Page;
@@ -21,6 +23,7 @@ import java.util.List;
 
 @Validated
 @Controller
+@SessionAttributes("userLogin")
 public class ProductController {
 
     @Autowired
@@ -65,8 +68,10 @@ public class ProductController {
         page.setResults(productList);
 
         model.addAttribute("productPage", page);
-        if (category != null) model.addAttribute("category", category);
         model.addAttribute("orderBy", orderBy);
+
+        if (category != null) model.addAttribute("category", category);
+        if (search != null) model.addAttribute("search", search);
 
         return "index";
     }

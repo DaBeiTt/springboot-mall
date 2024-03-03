@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SUCCESS</title>
+    <style>
+        p{
+            font-size: 50px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<div style="text-align: center">
+    <p th:text="${successMessage}"></p>
+</div>
+
+<script>
+    // 3 秒後自動重新導向到別的頁面
+    setTimeout(function() {
+        window.location.href = 'http://localhost:8080/loginPage';
+    }, 1500);
+
+</script>
+
+</body>
+</html>

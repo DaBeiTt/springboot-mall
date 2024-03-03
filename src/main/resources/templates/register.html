@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegisterPage</title>
+    <title>註冊</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,27 +13,28 @@
     <div class="form-box">
 
         <div class="form-value">
-            <form id="login_form">
+
+            <form id="login_form" th:object="${userRegisterRequest}" th:action="@{/users/register}" method="post">
 
                 <h2><ion-icon name="clipboard-outline"></ion-icon></h2>
                 <h2>註冊</h2>
                 <div class="input-box">
                     <ion-icon name="person-outline"></ion-icon>
-                    <input type="text" id="email" required>
+                    <input type="text" id="email" th:field="*{email}" required>
                     <label>郵 箱</label>
                 </div>
                 <div class="input-box">
                     <ion-icon name="lock-closed-outline"></ion-icon>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password" th:field="*{password}" required>
                     <label>密 碼</label>
                 </div>
                 <div class="input-box">
-                    <ion-icon name="checkmark-done-outline"></ion-icon>
-                    <input type="password" id="rePassword" required>
-                    <label>確 認 密 碼</label>
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    <input type="password" id="re_password" required>
+                    <label>確認密碼</label>
                 </div>
 
-                <button type="button" onclick="submitJson()">註 冊</button>
+                <button type="submit" onclick="validateEmailAndSubmit()">送 出</button>
 
             </form>
         </div>
@@ -42,68 +43,35 @@
 
 </section>
 
+<script>
+
+    // 驗證 email 格式
+    function validateEmailAndSubmit() {
+
+        var email = document.getElementById("email").value;
+        var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        var password = document.getElementById("password").value;
+        var rePassword = document.getElementById("re_password").value;
+
+        if (!emailPattern.test(email)) {
+            alert("請輸入有效的電子郵件地址！");
+            $('#password').val('');
+            $('#re_password').val('');
+            return;
+        }
+        else if (password != rePassword) {
+            alert("兩次輸入的密碼不一致！");
+            $('#password').val('');
+            $('#re_password').val('');
+            return;
+        }
+    }
+</script>
+
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<script>
-
-    // 按下Enter執行
-    document.addEventListener('keydown', function(event) {
-        // 按下 Enter 鍵，執行註冊函數
-        if (event.key === 'Enter') {
-            submitJson();
-        }
-    });
-
-    function submitJson() {
-
-        // 檢查郵箱格式
-        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(document.getElementById('email').value)) {
-            alert("請輸入有效的郵箱地址");
-            clearInput();
-            return;
-        }
-
-        // 確認密碼是否匹配
-        if (document.getElementById('password').value !== document.getElementById('rePassword').value) {
-            alert("再次輸入的密碼與第一次輸入的密碼不匹配");
-            clearInput();
-            return;
-        }
-
-        // 欲傳送數據
-        var formData = {
-            email: $('#email').val(),
-            password: $('#password').val(),
-        };
-
-        // 發送 request
-        $.ajax({
-            type: 'POST',
-            url: '/users/register',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function(response) {
-                // 處理成功回應
-                alert("註冊成功")
-                window.location.href = '/loginPage'; // 想要跳轉的頁面 URL
-            },
-            error: function(xhr, status, error) {
-                // 處理錯誤
-                alert("此郵箱已被註冊");
-                clearInput();
-            }
-        });
-    }
-
-    // 清空欄位
-    function clearInput() {
-        $('#password').val('');
-        $('#rePassword').val('');
-    }
-</script>
 
 </body>
 </html>

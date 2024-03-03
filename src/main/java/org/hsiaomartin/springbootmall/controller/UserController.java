@@ -9,44 +9,64 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 
 @Controller
+@SessionAttributes("userLogin")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
     @PostMapping("/users/register")
-    public ResponseEntity<User> register(@RequestBody @Valid UserRegisterRequest userRegisterRequest) {
+    public String register(@ModelAttribute @Valid UserRegisterRequest userRegisterRequest,
+                           Model model) {
 
-        Integer userId = userService.register(userRegisterRequest);
+        userService.register(userRegisterRequest);
 
-        User user = userService.getUserById(userId);
+        model.addAttribute("successMessage", "註冊成功！");
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+        return "success";
     }
 
     @PostMapping("/users/login")
-    public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest) {
+    public String login(@ModelAttribute @Valid UserLoginRequest userLoginRequest,
+                        Model model) {
 
         User user = userService.login(userLoginRequest);
 
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+        model.addAttribute("userLogin", user);
+
+        return "redirect:/products";
     }
 
-    @RequestMapping("/loginPage")
-    public String loginPage() {
+    // 登出
+    @RequestMapping("/logout")
+    public String logout(SessionStatus sessionStatus) {
 
-        return "login";
+        // 設定為完成會話，清除所有 session
+        sessionStatus.setComplete();
+
+        return "redirect:/";
     }
 
-    @RequestMapping("/registerPage")
-    public String registerPage() {
+    // 註冊頁面
+    @GetMapping("/registerPage")
+    public String registerPage(Model model) {
+
+        model.addAttribute("userRegisterRequest", new UserRegisterRequest());
 
         return "register";
+    }
+
+    // 登入頁面
+    @GetMapping("/loginPage")
+    public String loginPage(Model model) {
+
+        model.addAttribute("userLoginRequest", new UserLoginRequest());
+
+        return "login";
     }
 }

@@ -5,22 +5,24 @@
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <meta charset="UTF-8">
-    <title>Products</title>
+    <title>產品</title>
     <style>
         #null-container {
-            display: flex; /* 使用 flexbox 布局 */
-            justify-content: center; /* 水平居中 */
-            align-items: center; /* 垂直居中 */
-            height: 70vh; /* 设置容器高度为视口高度，以使容器充满整个视口 */
+            display: flex; /* 使用 flexbox 佈局 */
+            justify-content: center; /* 水平置中 */
+            align-items: center; /* 垂直置中 */
+            height: 70vh; /* 設置容器視口高度 */
         }
 
         #null-centered-content {
-            text-align: center; /* 文字居中 */
-            max-width: 800px; /* 设置内容最大宽度 */
+            text-align: center; /* 文字置中 */
+            max-width: 800px; /* 設置內容最大寬度 */
         }
     </style>
 </head>
 <body>
+
+<!-- 頁首 -->
 <header class="p-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -64,22 +66,23 @@
                 <input id="searchInput" type="search" class="form-control form-control-dark" placeholder="搜尋…" aria-label="Search">
             </form>
 
-            <div th:if="${loginUser == null}" class="text-end">
+            <div th:if="${userLogin == null}" class="text-end">
                 <a href="/loginPage"><button type="button" class="btn btn-outline-light me-2">登入</button></a>
                 <a href="/registerPage"><button type="button" class="btn btn-warning">註冊</button></a>
             </div>
 
-            <div th:unless="${loginUser == null}" class="text-end">
-                <p th:text="'Hi, ' + ${loginUser.email}"></p>
-                <a href="/products"><button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button></a>
+            <div th:unless="${userLogin == null}" class="text-end">
+                <p th:text="'Hi, ' + ${userLogin.email}"></p>
+                <button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button>
             </div>
         </div>
     </div>
 </header>
 
+<!-- 內容 -->
 <div class="b-example-divider"></div>
 <div class="container">
-    <!--  -->
+
     <div class="container p-3">
         <div class="row">
 
@@ -91,8 +94,8 @@
                         <p th:text="'售價：' + ${i.price}" class="card-text"></p>
                         <p th:text="'剩餘數量：' + ${i.stock}" class="card-text"></p>
                         <div th:if="${i.description != null}"><p th:text="'描述：' + ${i.description}" class="card-text"></p><br></div>
-                        <a th:if="${loginUser == null}" th:href="@{/loginPage}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
-                        <a th:unless="${loginUser == null}" th:href="@{/#}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
+                        <a th:if="${userLogin == null}" th:href="@{/loginPage}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
+                        <a th:unless="${userLogin == null}" th:href="@{/#}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
                     </div>
                 </div>
             </div>
@@ -115,15 +118,17 @@
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             <li th:if="${productPage.getOffset() != 0}" class="page-item">
-                <a th:if="${category == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} }">上一頁</a>
+                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} }">上一頁</a>
                 <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&category=' + ${category}}">上一頁</a>
+                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&search=' + ${search}}">上一頁</a>
                 <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&orderBy=' + ${orderBy}}">上一頁</a>
             </li>
             </li>
             <li>&ensp;</li>
             <li th:if="${productPage.getOffset()+6 < productPage.getTotal()}" class="page-item">
-                <a th:if="${category == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} }">下一頁</a>
+                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} }" th:method="post">下一頁</a>
                 <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&category=' + ${category}}">下一頁</a>
+                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&search=' + ${search}}">下一頁</a>
                 <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&orderBy=' + ${orderBy}}">下一頁</a>
             </li>
             </li>
@@ -131,7 +136,7 @@
     </nav>
 </div>
 
-
+<!-- 頁尾 -->
 <div class="container">
     <footer class="py-3 my-4">
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
@@ -153,9 +158,10 @@
 
         // 檢查用戶的選擇
         if (result) {
+            window.location.href="/logout"
             alert("已登出！");
         } else {
-            history.back();
+            // 無
         }
     }
 

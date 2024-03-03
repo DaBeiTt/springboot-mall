@@ -1,5 +1,6 @@
 package org.hsiaomartin.springbootmall.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -21,6 +22,10 @@ public class User {
     @JsonIgnore
     private String password;
 
+    // 設定返回時，讓返回的時間格式與變數格式對應
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private Date lastModifiedDate;
 }
