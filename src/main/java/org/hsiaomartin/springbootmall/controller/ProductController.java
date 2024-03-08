@@ -71,7 +71,7 @@ public class ProductController {
         if (category != null) model.addAttribute("category", category);
         if (search != null) model.addAttribute("search", search);
 
-        return "index";
+        return "product/index";
     }
 
     // CRUD

@@ -6,8 +6,6 @@ import org.hsiaomartin.springbootmall.dto.UserRegisterRequest;
 import org.hsiaomartin.springbootmall.model.User;
 import org.hsiaomartin.springbootmall.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +26,7 @@ public class UserController {
 
         model.addAttribute("successMessage", "註冊成功！");
 
-        return "success";
+        return "message/success";
     }
 
     @PostMapping("/users/login")
@@ -43,7 +41,7 @@ public class UserController {
     }
 
     // 登出
-    @RequestMapping("/logout")
+    @GetMapping("users/logout")
     public String logout(SessionStatus sessionStatus) {
 
         // 設定為完成會話，清除所有 session
@@ -58,7 +56,7 @@ public class UserController {
 
         model.addAttribute("userRegisterRequest", new UserRegisterRequest());
 
-        return "register";
+        return "member/register";
     }
 
     // 登入頁面
@@ -67,6 +65,6 @@ public class UserController {
 
         model.addAttribute("userLoginRequest", new UserLoginRequest());
 
-        return "login";
+        return "member/login";
     }
 }
