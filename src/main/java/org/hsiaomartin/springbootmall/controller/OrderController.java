@@ -3,31 +3,40 @@ package org.hsiaomartin.springbootmall.controller;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.Getter;
 import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
 import org.hsiaomartin.springbootmall.dto.OrderQueryParams;
 import org.hsiaomartin.springbootmall.model.Order;
+import org.hsiaomartin.springbootmall.model.OrderItem;
+import org.hsiaomartin.springbootmall.model.User;
 import org.hsiaomartin.springbootmall.service.OrderService;
 import org.hsiaomartin.springbootmall.util.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 @Validated
+@SessionAttributes("userLogin")
 public class OrderController {
 
     @Autowired
     private OrderService orderService;
 
     @GetMapping("/users/{userId}/orders")
-    public ResponseEntity<Page<Order>> getOrders(
+    public String getOrders(
             @PathVariable Integer userId,
-            @RequestParam(defaultValue = "10") @Max(1000) @Min(0) Integer limit,
-            @RequestParam(defaultValue = "0")  @Min(0) Integer offset
+            @RequestParam(defaultValue = "5") @Max(1000) @Min(0) Integer limit,
+            @RequestParam(defaultValue = "0")  @Min(0) Integer offset,
+
+            Model model
     ) {
 
         OrderQueryParams orderQueryParams = new OrderQueryParams(userId, limit, offset);
@@ -44,7 +53,23 @@ public class OrderController {
         page.setTotal(count);
         page.setResults(orderList);
 
-        return ResponseEntity.status(HttpStatus.OK).body(page);
+        model.addAttribute("orderPage", page);
+
+        return "order/userOrder";
+    }
+
+    @GetMapping("users/{userId}/orders/{orderId}")
+    public String getOrderItemsByOrderId(@PathVariable Integer userId,
+                                        @PathVariable Integer orderId,
+                                         Model model) {
+
+        Order order = orderService.getOrderById(orderId);
+
+        List<OrderItem> orderItemList = order.getOrderItemList();
+
+        model.addAttribute("orderItemList", orderItemList);
+
+        return "order/detail";
     }
 
     @PostMapping("/users/{userId}/orders")
