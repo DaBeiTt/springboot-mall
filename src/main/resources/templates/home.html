@@ -17,14 +17,15 @@
 <header class="p-3 bg-dark text-white">
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="#" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <ion-icon name="flag-outline"></ion-icon>
-            </a>
+            <p class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+                <ion-icon name="storefront-outline"></ion-icon>
+            </p>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                 <li>&ensp;</li>
                 <li><a href="/" class="nav-link px-2 text-secondary">首頁</a></li>
                 <li><a href="/products" class="nav-link px-2 text-white">產品</a></li>
+                <li th:if="${userLogin != null}"><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-white">訂單</a></li>
             </ul>
 
             <div th:if="${userLogin == null}" class="text-end">
@@ -33,7 +34,7 @@
             </div>
 
             <div th:if="${userLogin != null}" class="text-end">
-                <p th:text="'Hi, ' + ${userLogin.email}"></p>
+                <p th:text="'Hi, ' + ${userLogin.getEmail()}"></p>
                 <button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button>
             </div>
         </div>
@@ -159,6 +160,7 @@
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
             <li class="nav-item"><a href="/products" class="nav-link px-2 text-muted">Product</a></li>
+            <li th:if="${userLogin != null}" class="nav-item"><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-muted">Order</a></li>
         </ul>
         <p class="text-center text-muted">© 2024 Company, Spring Boot Demo Mall</p>
     </footer>
@@ -171,7 +173,7 @@
 
         // 檢查用戶的選擇
         if (result) {
-            window.location.href="/logout"
+            window.location.href="users/logout"
             alert("已登出！");
         } else {
             // 無
@@ -180,6 +182,9 @@
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<!-- ionicons -->
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
 </body>
 </html>
