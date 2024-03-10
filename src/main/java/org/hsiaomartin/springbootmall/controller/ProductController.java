@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.hsiaomartin.springbootmall.constant.ProductCategory;
+import org.hsiaomartin.springbootmall.dto.BuyItem;
 import org.hsiaomartin.springbootmall.dto.ProductQueryParams;
 import org.hsiaomartin.springbootmall.dto.ProductRequest;
 import org.hsiaomartin.springbootmall.model.Product;
@@ -67,6 +68,7 @@ public class ProductController {
 
         model.addAttribute("productPage", page);
         model.addAttribute("orderBy", orderBy);
+        model.addAttribute("buyItem", new BuyItem());
 
         if (category != null) model.addAttribute("category", category);
         if (search != null) model.addAttribute("search", search);

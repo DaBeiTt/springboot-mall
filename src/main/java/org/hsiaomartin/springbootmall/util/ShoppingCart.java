@@ -1,6 +1,7 @@
 package org.hsiaomartin.springbootmall.util;
 
 import org.hsiaomartin.springbootmall.dto.CartItem;
+import org.hsiaomartin.springbootmall.model.Product;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -25,7 +26,20 @@ public class ShoppingCart {
 
     public List<CartItem> getResults() {
 
-        return cartItemList;
+        return this.cartItemList;
+    }
+
+    public Integer isExist(Product product) {
+
+        Integer readyItemId =  product.getProductId();
+
+        for(int i = 0;i<cartItemList.size();i++) {
+            if(readyItemId == cartItemList.get(i).getProduct().getProductId()) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     public Integer getTotal() {

@@ -150,7 +150,7 @@
                     <form th:object="${buyItem}" th:action="@{/cart/add}" method="post" onsubmit="submitForm(event)">
                         <p style="display: inline">請輸入數量：</p>
                         <input type="hidden" th:field="*{productId}" id="productIdInput">
-                        <input type="number" th:field="*{quantity}" id="quantity">
+                        <input type="number" th:field="*{quantity}" id="quantity" min="1" required>
                         <button type="submit" class="btn btn-info" style="margin-left: 2%">確定</button>
                     </form>
                 </div>
@@ -239,7 +239,7 @@
             // 將產品 ID 設置到隱藏的 input 中
             document.getElementById('productIdInput').value = productId;
             // 清空欄位
-            document.getElementById('quantity').value = '';
+            document.getElementById('quantity').value = '1';
             // 打開 modal
             document.getElementById('myModal').style.display = 'block';
         });
