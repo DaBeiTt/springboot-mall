@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車</title>
+    <!-- bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+    <link href="css/cart.css" rel="stylesheet">
+</head>
+<body>
+<div th:if="${shoppingCart.getResults().size() != 0}" class="container">
+    <h1>我的購物車</h1>
+    <div th:each="i:${shoppingCart.getResults()}" class="cart">
+        <div class="cart-item">
+            <img th:src="${i.getProduct().getImageUrl()}">
+            <div class="item-details">
+                <h3 th:text="${i.getProduct().getProductName()}"></h3>
+                <p th:text="${'數量：' + i.getQuantity()}"></p>
+                <p th:text="${'總價：' + i.getProduct().getPrice() * i.getQuantity()}"></p>
+                <div class="d-flex align-items-end justify-content-end">
+                    <form th:action="@{'/cart/remove/{id}'(id=${i.getProduct().getProductId()})}" method="post">
+                        <button type="submit" class="remove-item" onclick="return confirm('要移除此商品嗎?')">移除</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${shoppingCart.getTotal() == 0}" class="container" id="null-container">
+    <div id="null-centered-content">
+        <h1><ion-icon name="sad-outline"></ion-icon>您的購物車是空的</h1><br>
+        <div style="text-align: center">
+            <button onclick="window.location.href = '/products'" type="button" class="btn btn-outline-secondary" style="margin-left: 10px;">去逛逛</button>
+        </div>
+    </div>
+</div>
+
+<div th:if="${shoppingCart.getTotal() != 0}" class="container">
+    <div class="d-flex align-items-end justify-content-end">
+        <h3 th:text="${'訂單總額：' + shoppingCart.getTotal()}"></h3><br>
+    </div>
+    <div class="d-flex align-items-end justify-content-end">
+        <button type="button" class="btn btn-outline-secondary" onclick="goBack()">返回</button>
+        <button type="button" class="btn btn-outline-success" style="margin-left: 10px;">創建訂單</button>
+    </div>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+<!-- ionicons -->
+<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+
+<!-- JavaScript Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
+
+</body>
+</html>

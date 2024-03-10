@@ -18,6 +18,41 @@
             text-align: center; /* 文字置中 */
             max-width: 800px; /* 設置內容最大寬度 */
         }
+        /* Modal樣式 */
+        .modal {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            text-align: center;
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 30%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -27,7 +62,7 @@
     <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <p class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                <ion-icon name="storefront-outline"></ion-icon>
+                <ion-icon name="storefront-outline" style="font-size: xxx-large"></ion-icon>
             </p>
 
             <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
@@ -76,6 +111,13 @@
                 <p th:text="'Hi, ' + ${userLogin.getEmail()}"></p>
                 <button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button>
             </div>
+
+            <div class="text-end">
+                <a href="/cart">
+                    <button type="button" class="btn"><ion-icon name="cart-outline" style="color: white; font-size: xx-large"></ion-icon></button>
+                </a>
+            </div>
+
         </div>
     </div>
 </header>
@@ -94,10 +136,23 @@
                         <h5 th:text="${i.getProductName()}" class="card-title"></h5>
                         <p th:text="'售價：' + ${i.getPrice()}" class="card-text"></p>
                         <p th:text="'剩餘數量：' + ${i.getStock()}" class="card-text"></p>
-                        <div th:if="${i.getDescription() != null}"><p th:text="'描述：' + ${i.getDescription()}" class="card-text"></p><br></div>
-                        <a th:if="${userLogin == null}" th:href="@{/loginPage}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
-                        <a th:unless="${userLogin == null}" th:href="@{/}" class="btn btn-primary mt-auto" style="width: fit-content;">購買</a>
+                        <p th:if="${i.getDescription() != null}" th:text="${i.getDescription()}" class="card-text"></p>
+                        <br>
+                        <button class="btn btn-primary mt-auto buyBtn" th:attr="productId=${i.getProductId()}" style="width: fit-content;">購買</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" style="text-align: left">&times;</span>
+                    <form th:object="${buyItem}" th:action="@{/cart/add}" method="post" onsubmit="submitForm(event)">
+                        <p style="display: inline">請輸入數量：</p>
+                        <input type="hidden" th:field="*{productId}" id="productIdInput">
+                        <input type="number" th:field="*{quantity}" id="quantity">
+                        <button type="submit" class="btn btn-info" style="margin-left: 2%">確定</button>
+                    </form>
                 </div>
             </div>
 
@@ -171,13 +226,39 @@
         window.location.href = searchUrl;
     });
 </script>
+<script>
+
+    // 獲取所有的 buyBtn 按鈕
+    var buyBtns = document.querySelectorAll('.buyBtn');
+
+    // 對每個按鈕添加點擊事件監聽器
+    buyBtns.forEach(function(buyBtn) {
+        buyBtn.addEventListener('click', function() {
+            // 獲取被點擊的按鈕的 data-product-id 屬性值
+            var productId = buyBtn.getAttribute('productId');
+            // 將產品 ID 設置到隱藏的 input 中
+            document.getElementById('productIdInput').value = productId;
+            // 清空欄位
+            document.getElementById('quantity').value = '';
+            // 打開 modal
+            document.getElementById('myModal').style.display = 'block';
+        });
+    });
+
+    // 獲取 modal 中的關閉按鈕並綁定事件
+    var closeBtn = document.querySelector('.close');
+    closeBtn.addEventListener('click', function() {
+        document.getElementById('myModal').style.display = 'none';
+    });
+
+</script>
 
 <!-- JavaScript Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-/bQdsTh/da6pkI1MST/rWKFNjaCP5gBSY4sEBT38Q/9RBh9AH40zEOg7Hlq2THRZ" crossorigin="anonymous"></script>
-<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 
 <!-- ionicons -->
 <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 
 </body>
 </html>
