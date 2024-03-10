@@ -13,7 +13,7 @@ public class MyExceptionHandler {
 
         model.addAttribute("errorMessage", e.getMessage());
 
-        return "error";
+        return "message/error";
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -21,6 +21,6 @@ public class MyExceptionHandler {
 
         model.addAttribute("errorMessage", e.getReason());
 
-        return "error";
+        return "message/error";
     }
 }
