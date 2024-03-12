@@ -16,7 +16,8 @@
             <img th:src="${i.getProduct().getImageUrl()}">
             <div class="item-details">
                 <h3 th:text="${i.getProduct().getProductName()}"></h3>
-                <p th:text="${'數量：' + i.getQuantity()}"></p>
+                <input class="productId" type="hidden" th:value="${i.getProduct().getProductId()}">
+                <p class="quantity" th:text="${'數量：' + i.getQuantity()}" th:attr="value=${i.getQuantity()}"></p>
                 <p th:text="${'總價：' + i.getProduct().getPrice() * i.getQuantity()}"></p>
                 <div class="d-flex align-items-end justify-content-end">
                     <form th:action="@{'/cart/remove/{id}'(id=${i.getProduct().getProductId()})}" method="post">
@@ -44,7 +45,13 @@
     <div class="d-flex align-items-end justify-content-end">
         <button type="button" class="btn btn-outline-secondary" onclick="goBack()">返回</button>
         <button th:if="${userLogin == null}" type="button" class="btn btn-outline-success" style="margin-left: 10px;" onclick="login()">創建訂單</button>
-        <button th:unless="${userLogin == null}" type="button" class="btn btn-outline-success" style="margin-left: 10px;">創建訂單</button>
+        <form th:unless="${userLogin == null}" th:action="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" method="post">
+            <div th:each="buyItem, index : ${createOrderRequest.getBuyItemList()}">
+                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].productId}" th:value="${buyItem.getProductId()}">
+                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].quantity}" th:value="${buyItem.getQuantity()}">
+            </div>
+            <button type="submit" id="createOrderBtn" class="btn btn-outline-success" style="margin-left: 10px;">創建訂單</button>
+        </form>
     </div>
 </div>
 

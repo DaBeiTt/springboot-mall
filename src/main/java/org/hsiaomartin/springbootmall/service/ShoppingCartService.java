@@ -1,13 +1,13 @@
 package org.hsiaomartin.springbootmall.service;
 
 import org.hsiaomartin.springbootmall.dto.CartItem;
+import org.hsiaomartin.springbootmall.dto.ShoppingCart;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.Model;
 
 @Component
 public interface ShoppingCartService {
 
-    void getCart(Model model);
+    ShoppingCart getCart();
 
     void addCartItem(CartItem cartItem);
 

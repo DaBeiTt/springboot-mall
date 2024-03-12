@@ -1,6 +1,7 @@
 package org.hsiaomartin.springbootmall.controller;
 
 import jakarta.validation.Valid;
+import org.hsiaomartin.springbootmall.dto.SuccessObject;
 import org.hsiaomartin.springbootmall.dto.UserLoginRequest;
 import org.hsiaomartin.springbootmall.dto.UserRegisterRequest;
 import org.hsiaomartin.springbootmall.model.User;
@@ -24,7 +25,11 @@ public class UserController {
 
         userService.register(userRegisterRequest);
 
-        model.addAttribute("successMessage", "註冊成功！");
+        SuccessObject successObject = new SuccessObject();
+        successObject.setEvent("register");
+        successObject.setMessage("註冊成功！");
+
+        model.addAttribute("success", successObject);
 
         return "message/success";
     }

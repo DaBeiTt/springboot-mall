@@ -10,16 +10,27 @@
     </style>
 </head>
 <body>
+<p id="userId" th:attr="userId=${userLogin.getUserId()}"></p>
 <div style="text-align: center">
-    <p th:text="${successMessage}"></p>
+    <p id="message" th:text="${success.getMessage()}" th:attr="value=${success.getEvent()}"></p>
 </div>
 
 <script>
 
-    // 1.5 秒後自動重新導向到登入畫面
-    setTimeout(function() {
-        window.location.href = 'http://localhost:8080/loginPage';
-    }, 1500);
+    var event = document.getElementById('message').getAttribute('value');
+    var userId = document.getElementById('userId').getAttribute('userId');
+
+    if (event == 'register') {
+        setTimeout(function() {
+            window.location.href = 'http://localhost:8080/loginPage';
+        }, 1500);
+    }
+
+    if (event == 'createOrder') {
+        setTimeout(function() {
+            window.location.href = 'http://localhost:8080/users/' + userId + '/orders';
+        }, 1500);
+    }
 
 </script>
 

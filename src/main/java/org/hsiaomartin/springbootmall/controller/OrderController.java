@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
 import org.hsiaomartin.springbootmall.dto.OrderQueryParams;
+import org.hsiaomartin.springbootmall.dto.SuccessObject;
 import org.hsiaomartin.springbootmall.model.Order;
 import org.hsiaomartin.springbootmall.model.OrderItem;
 import org.hsiaomartin.springbootmall.model.User;
@@ -29,6 +30,9 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private CreateOrderRequest createOrderRequest;
 
     @GetMapping("/users/{userId}/orders")
     public String getOrders(
@@ -73,13 +77,22 @@ public class OrderController {
     }
 
     @PostMapping("/users/{userId}/orders")
-    public ResponseEntity<Order> createOrder(@PathVariable Integer userId,
-                                         @RequestBody @Valid CreateOrderRequest createOrderRequest) {
+    public String createOrder(@PathVariable Integer userId,
+                              @ModelAttribute @Valid CreateOrderRequest createOrderRequest,
+                              Model model) {
 
         Integer orderId = orderService.createOrder(userId, createOrderRequest);
 
         Order order = orderService.getOrderById(orderId);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(order);
+        SuccessObject successObject = new SuccessObject();
+        successObject.setEvent("createOrder");
+        successObject.setMessage("訂單新增成功!");
+        model.addAttribute("success", successObject);
+
+        // 將已完成創建的 createOrderRequest 清空
+        this.createOrderRequest.setBuyItemList(new ArrayList<>());
+
+        return "message/success";
     }
 }

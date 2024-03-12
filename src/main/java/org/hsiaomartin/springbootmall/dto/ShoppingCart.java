@@ -1,4 +1,4 @@
-package org.hsiaomartin.springbootmall.util;
+package org.hsiaomartin.springbootmall.dto;
 
 import org.hsiaomartin.springbootmall.dto.CartItem;
 import org.hsiaomartin.springbootmall.model.Product;

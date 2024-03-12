@@ -2,6 +2,8 @@ package org.hsiaomartin.springbootmall.controller;
 
 import org.hsiaomartin.springbootmall.dto.BuyItem;
 import org.hsiaomartin.springbootmall.dto.CartItem;
+import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
+import org.hsiaomartin.springbootmall.model.User;
 import org.hsiaomartin.springbootmall.service.ProductService;
 import org.hsiaomartin.springbootmall.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,19 +12,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@SessionAttributes("userLogin")
+@SessionAttributes(names = {"userLogin"})
 public class ShoppingCartController {
 
     @Autowired
     private ShoppingCartService shoppingCartService;
 
     @Autowired
+    private CreateOrderRequest createOrderRequest;
+
+    @Autowired
     private ProductService productService;
 
-    @GetMapping("cart")
+    @GetMapping("/cart")
     public String getCart(Model model) {
 
-        shoppingCartService.getCart(model);
+        model.addAttribute("shoppingCart", shoppingCartService.getCart());
+        model.addAttribute("createOrderRequest", createOrderRequest);
 
         return "order/cart";
     }
@@ -35,6 +41,12 @@ public class ShoppingCartController {
         cartItem.setQuantity(buyItem.getQuantity());
 
         shoppingCartService.addCartItem(cartItem);
+
+        BuyItem buyItemToList = new BuyItem();
+        buyItemToList.setProductId(buyItem.getProductId());
+        buyItemToList.setQuantity(buyItem.getQuantity());
+
+        createOrderRequest.getBuyItemList().add(buyItemToList);
 
         return "redirect:/cart";
     }
