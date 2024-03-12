@@ -1,4 +1,4 @@
-package org.hsiaomartin.springbootmall.dto;
+package org.hsiaomartin.springbootmall.util;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,7 +1,7 @@
 package org.hsiaomartin.springbootmall.controller;
 
 import jakarta.validation.Valid;
-import org.hsiaomartin.springbootmall.dto.SuccessObject;
+import org.hsiaomartin.springbootmall.util.SuccessObject;
 import org.hsiaomartin.springbootmall.dto.UserLoginRequest;
 import org.hsiaomartin.springbootmall.dto.UserRegisterRequest;
 import org.hsiaomartin.springbootmall.model.User;

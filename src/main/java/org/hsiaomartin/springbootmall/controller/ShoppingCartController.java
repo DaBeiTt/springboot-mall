@@ -3,7 +3,6 @@ package org.hsiaomartin.springbootmall.controller;
 import org.hsiaomartin.springbootmall.dto.BuyItem;
 import org.hsiaomartin.springbootmall.dto.CartItem;
 import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
-import org.hsiaomartin.springbootmall.model.User;
 import org.hsiaomartin.springbootmall.service.ProductService;
 import org.hsiaomartin.springbootmall.service.ShoppingCartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +54,13 @@ public class ShoppingCartController {
     public String removeCartItem(@PathVariable Integer productId) {
 
         shoppingCartService.removeCartItem(productId);
+
+        for(BuyItem buyItem : createOrderRequest.getBuyItemList()) {
+            if(buyItem.getProductId() == productId) {
+                createOrderRequest.getBuyItemList().remove(buyItem);
+                break;
+            }
+        }
 
         return "redirect:/cart";
     }
