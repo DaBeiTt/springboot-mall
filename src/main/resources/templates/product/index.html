@@ -135,7 +135,8 @@
                     <div class="card-body" style="display: flex; flex-direction: column;">
                         <h5 th:text="${i.getProductName()}" class="card-title"></h5>
                         <p th:text="'售價：' + ${i.getPrice()}" class="card-text"></p>
-                        <p th:text="'剩餘數量：' + ${i.getStock()}" class="card-text"></p>
+                        <p th:if="${i.getStock()>0}" th:text="'剩餘數量：' + ${i.getStock()}" class="card-text"></p>
+                        <p th:unless="${i.getStock()>0}" th:text="'目前無庫存！'" class="card-text"></p>
                         <p th:if="${i.getDescription() != null}" th:text="${i.getDescription()}" class="card-text"></p>
                         <br>
                         <button class="btn btn-primary mt-auto buyBtn" th:attr="productId=${i.getProductId()}" style="width: fit-content;">購買</button>

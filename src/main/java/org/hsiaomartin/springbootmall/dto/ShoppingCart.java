@@ -51,4 +51,9 @@ public class ShoppingCart {
 
         return total;
     }
+
+    public void clearCart() {
+
+        this.cartItemList = new ArrayList<>();
+    }
 }

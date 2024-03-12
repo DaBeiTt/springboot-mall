@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-<p id="userId" th:attr="userId=${userLogin.getUserId()}"></p>
+<p th:if="${userLogin != null}" id="userId" th:attr="userId=${userLogin.getUserId()}"></p>
 <div style="text-align: center">
     <p id="message" th:text="${success.getMessage()}" th:attr="value=${success.getEvent()}"></p>
 </div>
@@ -18,7 +18,12 @@
 <script>
 
     var event = document.getElementById('message').getAttribute('value');
-    var userId = document.getElementById('userId').getAttribute('userId');
+
+    if(document.getElementById('userId') != null){
+        var userId = document.getElementById('userId').getAttribute('userId');
+    }
+
+    console.log(event);
 
     if (event == 'register') {
         setTimeout(function() {

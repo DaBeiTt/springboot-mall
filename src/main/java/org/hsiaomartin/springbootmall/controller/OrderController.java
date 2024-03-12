@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
 import org.hsiaomartin.springbootmall.dto.OrderQueryParams;
+import org.hsiaomartin.springbootmall.dto.ShoppingCart;
 import org.hsiaomartin.springbootmall.dto.SuccessObject;
 import org.hsiaomartin.springbootmall.model.Order;
 import org.hsiaomartin.springbootmall.model.OrderItem;
@@ -33,6 +34,9 @@ public class OrderController {
 
     @Autowired
     private CreateOrderRequest createOrderRequest;
+
+    @Autowired
+    private ShoppingCart shoppingCart;
 
     @GetMapping("/users/{userId}/orders")
     public String getOrders(
@@ -90,8 +94,9 @@ public class OrderController {
         successObject.setMessage("訂單新增成功!");
         model.addAttribute("success", successObject);
 
-        // 將已完成創建的 createOrderRequest 清空
+        // 訂單創建完成後將 createOrderRequest & shoppingCart 清空
         this.createOrderRequest.setBuyItemList(new ArrayList<>());
+        this.shoppingCart.clearCart();
 
         return "message/success";
     }
