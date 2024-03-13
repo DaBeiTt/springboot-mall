@@ -30,8 +30,7 @@
             window.location.href = 'http://localhost:8080/loginPage';
         }, 1500);
     }
-
-    if (event == 'createOrder') {
+    if (event == 'createOrder' || event == 'deleteOrder') {
         setTimeout(function() {
             window.location.href = 'http://localhost:8080/users/' + userId + '/orders';
         }, 1500);

@@ -85,14 +85,25 @@ public class OrderController {
 
         Order order = orderService.getOrderById(orderId);
 
-        SuccessObject successObject = new SuccessObject();
-        successObject.setEvent("createOrder");
-        successObject.setMessage("訂單新增成功!");
+        SuccessObject successObject = new SuccessObject("createOrder", "訂單新增成功!");
         model.addAttribute("success", successObject);
 
         // 訂單創建完成後將 createOrderRequest & shoppingCart 清空
         this.createOrderRequest.setBuyItemList(new ArrayList<>());
         this.shoppingCart.clearCart();
+
+        return "message/success";
+    }
+
+    @DeleteMapping("/users/{userId}/orders/{orderId}")
+    public String deleteOrderById(@PathVariable Integer userId,
+                                  @PathVariable Integer orderId,
+                                  Model model) {
+
+        orderService.deleteOrderById(orderId);
+
+        SuccessObject successObject = new SuccessObject("deleteOrder", "訂單刪除成功");
+        model.addAttribute("success", successObject);
 
         return "message/success";
     }

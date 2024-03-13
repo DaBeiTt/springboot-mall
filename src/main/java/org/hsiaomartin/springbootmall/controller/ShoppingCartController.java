@@ -50,7 +50,7 @@ public class ShoppingCartController {
         return "redirect:/cart";
     }
 
-    @RequestMapping("cart/remove/{productId}")
+    @DeleteMapping("cart/remove/{productId}")
     public String removeCartItem(@PathVariable Integer productId) {
 
         shoppingCartService.removeCartItem(productId);

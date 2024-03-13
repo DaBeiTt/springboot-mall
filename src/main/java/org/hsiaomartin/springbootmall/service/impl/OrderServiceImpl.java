@@ -121,4 +121,12 @@ public class OrderServiceImpl implements OrderService {
 
         return orderId;
     }
+
+    @Override
+    public void deleteOrderById(Integer orderId) {
+
+        orderDao.deleteOrderById(orderId);
+
+        orderDao.deleteOrderItemsByOrderId(orderId);
+    }
 }

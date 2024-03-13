@@ -20,7 +20,7 @@
                 <p class="quantity" th:text="${'數量：' + i.getQuantity()}" th:attr="value=${i.getQuantity()}"></p>
                 <p th:text="${'總價：' + i.getProduct().getPrice() * i.getQuantity()}"></p>
                 <div class="d-flex align-items-end justify-content-end">
-                    <form th:action="@{'/cart/remove/{id}'(id=${i.getProduct().getProductId()})}" method="post">
+                    <form th:action="@{'/cart/remove/{id}'(id=${i.getProduct().getProductId()})}" th:method="delete">
                         <button type="submit" class="remove-item" onclick="return confirm('要移除此商品嗎?')">移除</button>
                     </form>
                 </div>
@@ -50,7 +50,7 @@
                 <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].productId}" th:value="${buyItem.getProductId()}">
                 <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].quantity}" th:value="${buyItem.getQuantity()}">
             </div>
-            <button type="submit" id="createOrderBtn" class="btn btn-outline-success" style="margin-left: 10px;">創建訂單</button>
+            <button type="submit" id="createOrderBtn" class="btn btn-outline-success" style="margin-left: 10px;" onclick="return confirm('確定要創建訂單嗎?')">創建訂單</button>
         </form>
     </div>
 </div>

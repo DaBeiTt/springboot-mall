@@ -25,10 +25,7 @@ public class UserController {
 
         userService.register(userRegisterRequest);
 
-        SuccessObject successObject = new SuccessObject();
-        successObject.setEvent("register");
-        successObject.setMessage("註冊成功！");
-
+        SuccessObject successObject = new SuccessObject("register", "註冊成功！");
         model.addAttribute("success", successObject);
 
         return "message/success";

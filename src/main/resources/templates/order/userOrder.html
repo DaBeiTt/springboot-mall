@@ -56,7 +56,7 @@
 
     <div class="container p-3">
 
-        <br><h3 th:if="${orderPage.getOffset() == 0}" th:text="${'共找到' + orderPage.getTotal() + '筆訂單'}"></h3><br>
+        <br><h3 th:if="${orderPage.getOffset() == 0 && orderPage.getTotal() != 0}" th:text="${'共找到' + orderPage.getTotal() + '筆訂單'}"></h3><br>
 
         <div th:each="i:${orderPage.getResults()}">
 
@@ -65,6 +65,9 @@
                 <div class="card-body">
                     <h4 class="card-title" th:text="${'訂單成立時間：' + #dates.format(i.getCreatedDate(), 'yyyy-MM-dd HH:mm:ss')}"></h4>
                     <h5 th:text="${'金額：' + i.getTotalAmount()}" class="card-text"></h5>
+                    <form th:action="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" th:method="delete">
+                        <button type="submit" th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" class="btn btn-danger" style="position: absolute; bottom: 5px; right: 70px;" onclick="return confirm('要移除此訂單嗎?')">刪除</button>
+                    </form>
                     <a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" class="btn btn-info" style="position: absolute; bottom: 5px; right: 5px;">詳情</a>
                 </div>
             </div>

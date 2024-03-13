@@ -9,4 +9,10 @@ public class SuccessObject {
 
     private String event;
     private String message;
+
+    public SuccessObject(String event, String message) {
+
+        this.event = event;
+        this.message = message;
+    }
 }

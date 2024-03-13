@@ -165,4 +165,26 @@ public class OrderDaoImpl implements OrderDao {
 
         return sql;
     }
+
+    @Override
+    public void deleteOrderById(Integer orderId) {
+
+        String sql = "DELETE FROM `order` WHERE order_id = :orderId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderId", orderId);
+
+        namedParameterJdbcTemplate.update(sql, map);
+    }
+
+    @Override
+    public void deleteOrderItemsByOrderId(Integer orderId) {
+
+        String sql = "DELETE FROM `order_item` WHERE order_id = :orderId";
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderId", orderId);
+
+        namedParameterJdbcTemplate.update(sql, map);
+    }
 }
