@@ -10,9 +10,9 @@
     </style>
 </head>
 <body>
-<p th:if="${userLogin != null}" id="userId" th:attr="userId=${userLogin.getUserId()}"></p>
+<p th:if="${userLogin != null}" id="userId" th:attr="userId=${userLogin.userId}"></p>
 <div style="text-align: center">
-    <p id="message" th:text="${success.getMessage()}" th:attr="value=${success.getEvent()}"></p>
+    <p id="message" th:text="${success.message}" th:attr="value=${success.event}"></p>
 </div>
 
 <script>

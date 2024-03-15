@@ -12,12 +12,12 @@
     <div class="card mx-auto" style="width: 70rem; border-radius: 15px; border-width: 3px">
       <div class="row">
         <div class="col-lg-6">
-          <img th:src="${i.getImgUrl()}" style="width:200px; height: 150px" class="card-img-top" alt="...">
+          <img th:src="${i.imgUrl}" style="width:200px; height: 150px" class="card-img-top" alt="...">
         </div>
         <div class="card-body col-lg-6">
-          <p th:text="${'產品名稱：' + i.getProductName()}" class="card-text"></p>
-          <p th:text="${'數量：' + i.getQuantity()}" class="card-text"></p>
-          <p th:text="${'金額：' + i.getAmount()}" class="card-text"></p>
+          <p th:text="${'產品名稱：' + i.productName}" class="card-text"></p>
+          <p th:text="${'數量：' + i.quantity}" class="card-text"></p>
+          <p th:text="${'金額：' + i.amount}" class="card-text"></p>
         </div>
       </div>
     </div>

@@ -69,7 +69,7 @@
                 <li>&ensp;</li>
                 <li><a href="/" class="nav-link px-2 text-secondary">首頁</a></li>
                 <li><a href="/products" class="nav-link px-2 text-white">產品</a></li>
-                <li th:if="${userLogin != null}"><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-white">訂單</a></li>
+                <li th:if="${userLogin != null}"><a th:href="@{'/users/' + ${userLogin.userId} + '/orders'}" class="nav-link px-2 text-white">訂單</a></li>
             </ul>
 
             <div class="dropdown">
@@ -108,7 +108,7 @@
             </div>
 
             <div th:unless="${userLogin == null}" class="text-end">
-                <p th:text="'Hi, ' + ${userLogin.getEmail()}"></p>
+                <p th:text="'Hi, ' + ${userLogin.email}"></p>
                 <button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button>
             </div>
 
@@ -129,17 +129,17 @@
     <div class="container p-3">
         <div class="row">
 
-            <div th:each="i:${productPage.getResults()}" class="col" STYLE="display: flex; justify-content: center; align-items: center;">
+            <div th:each="i:${productPage.results}" class="col" STYLE="display: flex; justify-content: center; align-items: center;">
                 <div class="card" style="width: 25rem; height: 100%">
-                    <img th:src="${i.getImageUrl()}" style="height: 250px" class="card-img-top" alt="沒有圖片">
+                    <img th:src="${i.imageUrl}" style="height: 250px" class="card-img-top" alt="沒有圖片">
                     <div class="card-body" style="display: flex; flex-direction: column;">
-                        <h5 th:text="${i.getProductName()}" class="card-title"></h5>
-                        <p th:text="'售價：' + ${i.getPrice()}" class="card-text"></p>
-                        <p th:if="${i.getStock()>0}" th:text="'剩餘數量：' + ${i.getStock()}" class="card-text"></p>
-                        <p th:unless="${i.getStock()>0}" th:text="'目前無庫存！'" class="card-text"></p>
-                        <p th:if="${i.getDescription() != null}" th:text="${i.getDescription()}" class="card-text"></p>
+                        <h5 th:text="${i.productName}" class="card-title"></h5>
+                        <p th:text="'售價： NT$ ' + ${i.price}" class="card-text"></p>
+                        <p th:if="${i.stock > 0}" th:text="'剩餘數量：' + ${i.stock}" class="card-text"></p>
+                        <p th:unless="${i.stock > 0}" th:text="'目前無庫存！'" class="card-text"></p>
+                        <p th:if="${i.description != null}" th:text="${i.description}" class="card-text"></p>
                         <br>
-                        <button class="btn btn-primary mt-auto buyBtn" th:attr="productId=${i.getProductId()}" style="width: fit-content;">購買</button>
+                        <button class="btn btn-primary mt-auto buyBtn" th:attr="productId=${i.productId}" style="width: fit-content;">購買</button>
                     </div>
                 </div>
             </div>
@@ -157,7 +157,7 @@
                 </div>
             </div>
 
-            <div id="null-container" th:if="${productPage.getResults().size() == 0}">
+            <div id="null-container" th:if="${productPage.results.size() == 0}">
                     <div id="null-centered-content">
                         <h1><ion-icon name="sad-outline"></ion-icon>找不到符合的產品資訊</h1>
                     </div>
@@ -168,23 +168,23 @@
 
 </div>
 
-<div th:if="${productPage.getResults().size() != 0}">
+<div th:if="${productPage.results.size() != 0}">
     <br>
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
-            <li th:if="${productPage.getOffset() != 0}" class="page-item">
-                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} }">上一頁</a>
-                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&category=' + ${category}}">上一頁</a>
-                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&search=' + ${search}}">上一頁</a>
-                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()-6} + '&orderBy=' + ${orderBy}}">上一頁</a>
+            <li th:if="${productPage.offset != 0}" class="page-item">
+                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset - 6} }">上一頁</a>
+                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset - 6} + '&category=' + ${category}}">上一頁</a>
+                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset - 6} + '&search=' + ${search}}">上一頁</a>
+                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset - 6} + '&orderBy=' + ${orderBy}}">上一頁</a>
             </li>
             </li>
             <li>&ensp;</li>
-            <li th:if="${productPage.getOffset()+6 < productPage.getTotal()}" class="page-item">
-                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} }">下一頁</a>
-                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&category=' + ${category}}">下一頁</a>
-                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&search=' + ${search}}">下一頁</a>
-                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.getOffset()+6} + '&orderBy=' + ${orderBy}}">下一頁</a>
+            <li th:if="${productPage.offset + 6 < productPage.total}" class="page-item">
+                <a th:if="${category == null && search == null && orderBy == 'created_date'}" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset + 6} }">下一頁</a>
+                <a th:if="${category} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset + 6} + '&category=' + ${category}}">下一頁</a>
+                <a th:if="${search} != null" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset + 6} + '&search=' + ${search}}">下一頁</a>
+                <a th:if="${orderBy} != 'created_date'" class="page-link" th:href="@{'/products?offset=' + ${productPage.offset + 6} + '&orderBy=' + ${orderBy}}">下一頁</a>
             </li>
             </li>
         </ul>
@@ -197,7 +197,7 @@
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
             <li class="nav-item"><a href="/products" class="nav-link px-2 text-muted">Product</a></li>
-            <li th:if="${userLogin != null}" class="nav-item"><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-muted">Order</a></li>
+            <li th:if="${userLogin != null}" class="nav-item"><a th:href="@{'/users/' + ${userLogin.userId} + '/orders'}" class="nav-link px-2 text-muted">Order</a></li>
         </ul>
         <p class="text-center text-muted">© 2024 Company, Spring Boot Demo Mall</p>
     </footer>

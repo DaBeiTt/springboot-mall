@@ -5,7 +5,7 @@
     <!-- CSS only -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
     <meta charset="UTF-8">
-    <title th:text="${userLogin.getEmail() + ' 的訂單'}"></title>
+    <title th:text="${userLogin.email + ' 的訂單'}"></title>
     <style>
         #null-container {
             display: flex; /* 使用 flexbox 佈局 */
@@ -34,7 +34,7 @@
                 <li>&ensp;</li>
                 <li><a href="/" class="nav-link px-2 text-secondary">首頁</a></li>
                 <li><a href="/products" class="nav-link px-2 text-white">產品</a></li>
-                <li><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-white">訂單</a></li>
+                <li><a th:href="@{'/users/' + ${userLogin.userId} + '/orders'}" class="nav-link px-2 text-white">訂單</a></li>
             </ul>
 
             <div th:if="${userLogin == null}" class="text-end">
@@ -43,7 +43,7 @@
             </div>
 
             <div th:unless="${userLogin == null}" class="text-end">
-                <p th:text="${'Hi, ' + userLogin.getEmail()}"></p>
+                <p th:text="${'Hi, ' + userLogin.email}"></p>
                 <button type="button" class="btn btn-warning" onclick="confirmAction()">登出</button>
             </div>
         </div>
@@ -56,26 +56,26 @@
 
     <div class="container p-3">
 
-        <br><h3 th:if="${orderPage.getOffset() == 0 && orderPage.getTotal() != 0}" th:text="${'共找到' + orderPage.getTotal() + '筆訂單'}"></h3><br>
+        <br><h3 th:if="${orderPage.offset == 0 && orderPage.total != 0}" th:text="${'共找到' + orderPage.total + '筆訂單'}"></h3><br>
 
-        <div th:each="i:${orderPage.getResults()}">
+        <div th:each="i:${orderPage.results}">
 
             <div class="card mx-auto" style="width: 70rem; border-radius: 15px; border-width: 3px">
 
                 <div class="card-body">
-                    <h4 class="card-title" th:text="${'訂單成立時間：' + #dates.format(i.getCreatedDate(), 'yyyy-MM-dd HH:mm:ss')}"></h4>
-                    <h5 th:text="${'金額：' + i.getTotalAmount()}" class="card-text"></h5>
-                    <form th:action="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" th:method="delete">
-                        <button type="submit" th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" class="btn btn-danger" style="position: absolute; bottom: 5px; right: 70px;" onclick="return confirm('要移除此訂單嗎?')">刪除</button>
+                    <h4 class="card-title" th:text="${'訂單成立時間：' + #dates.format(i.createdDate, 'yyyy-MM-dd HH:mm:ss')}"></h4>
+                    <h5 th:text="${'金額： NT$ ' + i.totalAmount}" class="card-text"></h5>
+                    <form th:action="@{'/users/' + ${userLogin.userId} + '/orders/' + ${i.orderId} }" th:method="delete">
+                        <button type="submit" th:href="@{'/users/' + ${userLogin.userId} + '/orders/' + ${i.orderId} }" class="btn btn-danger" style="position: absolute; bottom: 5px; right: 70px;" onclick="return confirm('要移除此訂單嗎?')">刪除</button>
                     </form>
-                    <a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders/' + ${i.getOrderId()} }" class="btn btn-info" style="position: absolute; bottom: 5px; right: 5px;">詳情</a>
+                    <a th:href="@{'/users/' + ${userLogin.userId} + '/orders/' + ${i.orderId} }" class="btn btn-info" style="position: absolute; bottom: 5px; right: 5px;">詳情</a>
                 </div>
             </div>
             <br>
         </div>
 
 
-        <div id="null-container" th:if="${orderPage.getTotal() == 0}">
+        <div id="null-container" th:if="${orderPage.total == 0}">
             <div id="null-centered-content">
                 <h1><ion-icon name="bag-remove-outline"></ion-icon> 您沒有任何訂單</h1>
             </div>
@@ -85,17 +85,17 @@
 
 </div>
 
-<div th:if="${orderPage.getTotal() != 0}">
+<div th:if="${orderPage.total != 0}">
     <br>
     <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
-            <li th:if="${orderPage.getOffset() != 0}" class="page-item">
-                <a class="page-link" th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders?offset=' + ${orderPage.getOffset()-5} }">上一頁</a>
+            <li th:if="${orderPage.offset != 0}" class="page-item">
+                <a class="page-link" th:href="@{'/users/' + ${userLogin.userId} + '/orders?offset=' + ${orderPage.offset - 5} }">上一頁</a>
             </li>
             </li>
             <li>&ensp;</li>
-            <li th:if="${orderPage.getOffset()+5 < orderPage.getTotal()}" class="page-item">
-                <a class="page-link" th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders?offset=' + ${orderPage.getOffset()+5} }">下一頁</a>
+            <li th:if="${orderPage.offset + 5 < orderPage.total}" class="page-item">
+                <a class="page-link" th:href="@{'/users/' + ${userLogin.userId} + '/orders?offset=' + ${orderPage.offset + 5} }">下一頁</a>
             </li>
             </li>
         </ul>
@@ -108,7 +108,7 @@
         <ul class="nav justify-content-center border-bottom pb-3 mb-3">
             <li class="nav-item"><a href="/" class="nav-link px-2 text-muted">Home</a></li>
             <li class="nav-item"><a href="/products" class="nav-link px-2 text-muted">Product</a></li>
-            <li class="nav-item"><a th:href="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" class="nav-link px-2 text-muted">Order</a></li>
+            <li class="nav-item"><a th:href="@{'/users/' + ${userLogin.userId} + '/orders'}" class="nav-link px-2 text-muted">Order</a></li>
         </ul>
         <p class="text-center text-muted">© 2024 Company, Spring Boot Demo Mall</p>
     </footer>

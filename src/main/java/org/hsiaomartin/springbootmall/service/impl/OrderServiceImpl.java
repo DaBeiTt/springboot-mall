@@ -122,6 +122,7 @@ public class OrderServiceImpl implements OrderService {
         return orderId;
     }
 
+    @Transactional
     @Override
     public void deleteOrderById(Integer orderId) {
 

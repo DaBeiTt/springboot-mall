@@ -9,18 +9,18 @@
     <link href="css/cart.css" rel="stylesheet">
 </head>
 <body>
-<div th:if="${shoppingCart.getResults().size() != 0}" class="container">
+<div th:if="${shoppingCart.results.size() != 0}" class="container">
     <h1>我的購物車</h1>
-    <div th:each="i:${shoppingCart.getResults()}" class="cart">
+    <div th:each="i:${shoppingCart.results}" class="cart">
         <div class="cart-item">
-            <img th:src="${i.getProduct().getImageUrl()}">
+            <img th:src="${i.product.imageUrl}">
             <div class="item-details">
-                <h3 th:text="${i.getProduct().getProductName()}"></h3>
-                <input class="productId" type="hidden" th:value="${i.getProduct().getProductId()}">
-                <p class="quantity" th:text="${'數量：' + i.getQuantity()}" th:attr="value=${i.getQuantity()}"></p>
-                <p th:text="${'總價：' + i.getProduct().getPrice() * i.getQuantity()}"></p>
+                <h3 th:text="${i.product.productName}"></h3>
+                <input class="productId" type="hidden" th:value="${i.product.productId}">
+                <p class="quantity" th:text="${'數量：' + i.quantity}" th:attr="value=${i.quantity}"></p>
+                <p th:text="${'總價： NT$ ' + i.product.price * i.quantity}"></p>
                 <div class="d-flex align-items-end justify-content-end">
-                    <form th:action="@{'/cart/remove/{id}'(id=${i.getProduct().getProductId()})}" th:method="delete">
+                    <form th:action="@{'/cart/remove/{id}'(id=${i.product.productId})}" th:method="delete">
                         <button type="submit" class="remove-item" onclick="return confirm('要移除此商品嗎?')">移除</button>
                     </form>
                 </div>
@@ -29,7 +29,7 @@
     </div>
 </div>
 
-<div th:if="${shoppingCart.getTotal() == 0}" class="container" id="null-container">
+<div th:if="${shoppingCart.total == 0}" class="container" id="null-container">
     <div id="null-centered-content">
         <h1><ion-icon name="sad-outline"></ion-icon>您的購物車是空的</h1><br>
         <div style="text-align: center">
@@ -38,17 +38,17 @@
     </div>
 </div>
 
-<div th:if="${shoppingCart.getTotal() != 0}" class="container">
+<div th:if="${shoppingCart.total != 0}" class="container">
     <div class="d-flex align-items-end justify-content-end">
-        <h3 th:text="${'訂單總額：' + shoppingCart.getTotal()}"></h3><br>
+        <h3 th:text="${'訂單總額：' + shoppingCart.total}"></h3><br>
     </div>
     <div class="d-flex align-items-end justify-content-end">
         <button type="button" class="btn btn-outline-secondary" onclick="goBack()">返回</button>
         <button th:if="${userLogin == null}" type="button" class="btn btn-outline-success" style="margin-left: 10px;" onclick="login()">創建訂單</button>
-        <form th:unless="${userLogin == null}" th:action="@{'/users/' + ${userLogin.getUserId()} + '/orders'}" method="post">
-            <div th:each="buyItem, index : ${createOrderRequest.getBuyItemList()}">
-                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].productId}" th:value="${buyItem.getProductId()}">
-                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${index.index}__].quantity}" th:value="${buyItem.getQuantity()}">
+        <form th:unless="${userLogin == null}" th:action="@{'/users/' + ${userLogin.userId} + '/orders'}" method="post">
+            <div th:each="buyItem : ${createOrderRequest.buyItemList}">
+                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${buyItemStat.index}__].productId}" th:value="${buyItem.productId}">
+                <input type="hidden" th:field="*{createOrderRequest.buyItemList[__${buyItemStat.index}__].quantity}" th:value="${buyItem.quantity}">
             </div>
             <button type="submit" id="createOrderBtn" class="btn btn-outline-success" style="margin-left: 10px;" onclick="return confirm('確定要創建訂單嗎?')">創建訂單</button>
         </form>

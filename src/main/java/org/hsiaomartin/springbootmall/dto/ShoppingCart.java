@@ -1,6 +1,5 @@
 package org.hsiaomartin.springbootmall.dto;
 
-import org.hsiaomartin.springbootmall.dto.CartItem;
 import org.hsiaomartin.springbootmall.model.Product;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
