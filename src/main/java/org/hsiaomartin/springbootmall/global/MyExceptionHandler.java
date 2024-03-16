@@ -8,14 +8,6 @@ import org.springframework.web.server.ResponseStatusException;
 @ControllerAdvice
 public class MyExceptionHandler {
 
-    @ExceptionHandler(Exception.class)
-    public String handleException(Exception e, Model model) {
-
-        model.addAttribute("errorMessage", e.getMessage());
-
-        return "message/error";
-    }
-
     @ExceptionHandler(ResponseStatusException.class)
     public String handleResponseStatusException(ResponseStatusException e, Model model) {
 
