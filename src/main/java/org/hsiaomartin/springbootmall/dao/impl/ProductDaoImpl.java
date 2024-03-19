@@ -170,4 +170,14 @@ public class ProductDaoImpl implements ProductDao {
 
         namedParameterJdbcTemplate.update(sql, map);
     }
+
+    @Override
+    public Integer getHighestPrice() {
+
+        String sql = "SELECT price FROM product WHERE price = (SELECT MAX(price) FROM product)";
+
+        Integer price = namedParameterJdbcTemplate.queryForObject(sql, new HashMap<>(), Integer.class);
+
+        return price;
+    }
 }

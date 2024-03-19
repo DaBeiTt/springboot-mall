@@ -2,13 +2,18 @@ package org.hsiaomartin.springbootmall.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hsiaomartin.springbootmall.constant.ProductCategory;
+import org.hsiaomartin.springbootmall.dao.ProductDao;
+import org.hsiaomartin.springbootmall.dto.ProductQueryParams;
 import org.hsiaomartin.springbootmall.dto.ProductRequest;
+import org.hsiaomartin.springbootmall.model.Product;
+import org.hsiaomartin.springbootmall.util.Page;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -25,6 +29,9 @@ public class ProductControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ProductDao productDao;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -199,13 +206,24 @@ public class ProductControllerTest {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/products");
 
-        mockMvc.perform(requestBuilder)
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
                 .andDo(print())
+                .andExpect(model().attributeExists("productPage", "orderBy", "buyItem"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(5)));
+                .andExpect(view().name("product/index"))
+                .andReturn();
+
+        Page page =  (Page) mvcResult.getModelAndView().getModel().get("productPage");
+        assertEquals(6, page.getLimit());
+        assertEquals(0, page.getOffset());
+        assertNotNull(page.getResults());
+
+        ProductQueryParams params = new ProductQueryParams();
+        params.setOrderBy("created_date");
+        params.setSort("desc");
+        params.setLimit(6);
+        params.setOffset(0);
+        assertEquals(productDao.countProduct(params), page.getTotal());
     }
 
     @Test
@@ -215,12 +233,26 @@ public class ProductControllerTest {
                 .param("search", "B")
                 .param("category", "CAR");
 
-        mockMvc.perform(requestBuilder)
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andDo(print())
+                .andExpect(model().attributeExists("productPage", "orderBy", "buyItem", "category", "search"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(2)));
+                .andExpect(view().name("product/index"))
+                .andReturn();
+
+        Page page =  (Page) mvcResult.getModelAndView().getModel().get("productPage");
+        assertEquals(6, page.getLimit());
+        assertEquals(0, page.getOffset());
+        assertNotNull(page.getResults());
+
+        ProductQueryParams params = new ProductQueryParams();
+        params.setCategory(ProductCategory.CAR);
+        params.setSearch("B");
+        params.setOrderBy("created_date");
+        params.setSort("desc");
+        params.setLimit(6);
+        params.setOffset(0);
+        assertEquals(productDao.countProduct(params), page.getTotal());
     }
 
     @Test
@@ -230,18 +262,24 @@ public class ProductControllerTest {
                 .param("orderBy", "price")
                 .param("sort", "desc");
 
-        mockMvc.perform(requestBuilder)
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
                 .andDo(print())
+                .andExpect(model().attributeExists("productPage", "orderBy", "buyItem"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(5)))
-                .andExpect(jsonPath("$.results[0].productId", equalTo(6)))
-                .andExpect(jsonPath("$.results[1].productId", equalTo(5)))
-                .andExpect(jsonPath("$.results[2].productId", equalTo(7)))
-                .andExpect(jsonPath("$.results[3].productId", equalTo(4)))
-                .andExpect(jsonPath("$.results[4].productId", equalTo(2)));
+                .andExpect(view().name("product/index"))
+                .andReturn();
+
+        Page<Product> page =  (Page) mvcResult.getModelAndView().getModel().get("productPage");
+        assertEquals(6, page.getLimit());
+        assertEquals(0, page.getOffset());
+        assertEquals(productDao.getHighestPrice(), page.getResults().get(0).getPrice());
+
+        ProductQueryParams params = new ProductQueryParams();
+        params.setOrderBy("created_date");
+        params.setSort("desc");
+        params.setLimit(6);
+        params.setOffset(0);
+        assertEquals(productDao.countProduct(params), page.getTotal());
     }
 
     @Test
@@ -251,14 +289,22 @@ public class ProductControllerTest {
                 .param("limit", "2")
                 .param("offset", "2");
 
-        mockMvc.perform(requestBuilder)
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
                 .andDo(print())
+                .andExpect(model().attributeExists("productPage", "orderBy", "buyItem"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(2)))
-                .andExpect(jsonPath("$.results[0].productId", equalTo(5)))
-                .andExpect(jsonPath("$.results[1].productId", equalTo(4)));
+                .andExpect(view().name("product/index"))
+                .andReturn();
+
+        Page<Product> page =  (Page) mvcResult.getModelAndView().getModel().get("productPage");
+        assertEquals(2, page.getLimit());
+        assertEquals(2, page.getOffset());
+
+        ProductQueryParams params = new ProductQueryParams();
+        params.setOrderBy("created_date");
+        params.setSort("desc");
+        params.setLimit(2);
+        params.setOffset(2);
+        assertEquals(productDao.countProduct(params), page.getTotal());
     }
 }
