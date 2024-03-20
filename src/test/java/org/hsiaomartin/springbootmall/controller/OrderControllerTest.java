@@ -1,24 +1,24 @@
 package org.hsiaomartin.springbootmall.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.hsiaomartin.springbootmall.dto.BuyItem;
-import org.hsiaomartin.springbootmall.dto.CreateOrderRequest;
+import org.hsiaomartin.springbootmall.dao.UserDao;
+import org.hsiaomartin.springbootmall.model.Order;
+import org.hsiaomartin.springbootmall.util.Page;
+import org.hsiaomartin.springbootmall.util.SuccessObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -27,57 +27,42 @@ public class OrderControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private UserDao userDao;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
     // 創建訂單
     @Transactional
     @Test
     public void createOrder_success() throws Exception {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest();
-        List<BuyItem> buyItemList = new ArrayList<>();
-
-        BuyItem buyItem1 = new BuyItem();
-        buyItem1.setProductId(1);
-        buyItem1.setQuantity(5);
-        buyItemList.add(buyItem1);
-
-        BuyItem buyItem2 = new BuyItem();
-        buyItem2.setProductId(2);
-        buyItem2.setQuantity(2);
-        buyItemList.add(buyItem2);
-
-        createOrderRequest.setBuyItemList(buyItemList);
-
-        String json = objectMapper.writeValueAsString(createOrderRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/{userId}/orders", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("buyItemList[0].productId", "1")
+                .param("buyItemList[0].quantity", "5")
+                .param("buyItemList[1].productId", "2")
+                .param("buyItemList[1].quantity", "2");
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201))
-                .andExpect(jsonPath("$.orderId", notNullValue()))
-                .andExpect(jsonPath("$.userId", equalTo(1)))
-                .andExpect(jsonPath("$.totalAmount", equalTo(750)))
-                .andExpect(jsonPath("$.orderItemList", hasSize(2)))
-                .andExpect(jsonPath("$.createdDate", notNullValue()))
-                .andExpect(jsonPath("$.lastModifiedDate", notNullValue()));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(model().attributeExists("success"))
+                .andExpect(view().name("message/success"))
+                .andReturn();
+
+        SuccessObject successObject = (SuccessObject) mvcResult.getModelAndView().getModel().get("success");
+        assertEquals("createOrder", successObject.getEvent());
+        assertEquals("訂單新增成功!", successObject.getMessage());
     }
 
     @Transactional
     @Test
     public void createOrder_illegalArgument_emptyBuyItemList() throws Exception {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest();
-        List<BuyItem> buyItemList = new ArrayList<>();
-        createOrderRequest.setBuyItemList(buyItemList);
-
-        String json = objectMapper.writeValueAsString(createOrderRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/{userId}/orders", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
@@ -86,139 +71,145 @@ public class OrderControllerTest {
     @Transactional
     @Test
     public void createOrder_userNotExist() throws Exception {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest();
-        List<BuyItem> buyItemList = new ArrayList<>();
-
-        BuyItem buyItem1 = new BuyItem();
-        buyItem1.setProductId(1);
-        buyItem1.setQuantity(1);
-        buyItemList.add(buyItem1);
-
-        createOrderRequest.setBuyItemList(buyItemList);
-
-        String json = objectMapper.writeValueAsString(createOrderRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/{userId}/orders", 100)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("buyItemList[0].productId", "1")
+                .param("buyItemList[0].quantity", "5");
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("該使用者不存在!", errorMessage);
     }
 
     @Transactional
     @Test
     public void createOrder_productNotExist() throws Exception {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest();
-        List<BuyItem> buyItemList = new ArrayList<>();
-
-        BuyItem buyItem1 = new BuyItem();
-        buyItem1.setProductId(100);
-        buyItem1.setQuantity(1);
-        buyItemList.add(buyItem1);
-
-        createOrderRequest.setBuyItemList(buyItemList);
-
-        String json = objectMapper.writeValueAsString(createOrderRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/{userId}/orders", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("buyItemList[0].productId", "100")
+                .param("buyItemList[0].quantity", "1");
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("該商品不存在!", errorMessage);
     }
 
     @Transactional
     @Test
     public void createOrder_stockNotEnough() throws Exception {
-        CreateOrderRequest createOrderRequest = new CreateOrderRequest();
-        List<BuyItem> buyItemList = new ArrayList<>();
-
-        BuyItem buyItem1 = new BuyItem();
-        buyItem1.setProductId(1);
-        buyItem1.setQuantity(10000);
-        buyItemList.add(buyItem1);
-
-        createOrderRequest.setBuyItemList(buyItemList);
-
-        String json = objectMapper.writeValueAsString(createOrderRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/{userId}/orders", 1)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("buyItemList[0].productId", "1")
+                .param("buyItemList[0].quantity", "100");
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("該商品庫存不足!", errorMessage);
     }
 
     // 查詢訂單列表
     @Test
     public void getOrders() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/users/{userId}/orders", 1);
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(2)))
-                .andExpect(jsonPath("$.results[0].orderId", notNullValue()))
-                .andExpect(jsonPath("$.results[0].userId", equalTo(1)))
-                .andExpect(jsonPath("$.results[0].totalAmount", equalTo(100000)))
-                .andExpect(jsonPath("$.results[0].orderItemList", hasSize(1)))
-                .andExpect(jsonPath("$.results[0].createdDate", notNullValue()))
-                .andExpect(jsonPath("$.results[0].lastModifiedDate", notNullValue()))
-                .andExpect(jsonPath("$.results[1].orderId", notNullValue()))
-                .andExpect(jsonPath("$.results[1].userId", equalTo(1)))
-                .andExpect(jsonPath("$.results[1].totalAmount", equalTo(500690)))
-                .andExpect(jsonPath("$.results[1].orderItemList", hasSize(3)))
-                .andExpect(jsonPath("$.results[1].createdDate", notNullValue()))
-                .andExpect(jsonPath("$.results[1].lastModifiedDate", notNullValue()));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/users/{userId}/orders", 1)
+                .with(request -> {
+                    request.setAttribute("userLogin", userDao.getUserById(1));
+                    return request;
+                });
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(model().attributeExists("orderPage"))
+                .andExpect(view().name("order/userOrder"))
+                .andReturn();
+
+        Page<Order> page = (Page) mvcResult.getModelAndView().getModel().get("orderPage");
+        assertEquals(5, page.getLimit());
+        assertEquals(0, page.getOffset());
+        assertNotNull(page.getResults());
     }
 
     @Test
     public void getOrders_pagination() throws Exception {
+
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/users/{userId}/orders", 1)
                 .param("limit", "2")
-                .param("offset", "2");
+                .param("offset", "2")
+                .with(request -> {
+                    request.setAttribute("userLogin", userDao.getUserById(1));
+                    return request;
+                });
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(0)));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(model().attributeExists("orderPage"))
+                .andExpect(view().name("order/userOrder"))
+                .andReturn();
+
+        Page<Order> page = (Page) mvcResult.getModelAndView().getModel().get("orderPage");
+        assertEquals(2, page.getLimit());
+        assertEquals(2, page.getOffset());
+        assertNotNull(page.getResults());
     }
 
     @Test
     public void getOrders_userHasNoOrder() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/users/{userId}/orders", 2);
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/users/{userId}/orders", 3)
+                .with(request -> {
+                    request.setAttribute("userLogin", userDao.getUserById(3));
+                    return request;
+                });
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(model().attributeExists("orderPage"))
+                .andExpect(view().name("order/userOrder"))
+                .andReturn();
+
+        Page<Order> page = (Page) mvcResult.getModelAndView().getModel().get("orderPage");
+        assertEquals(5, page.getLimit());
+        assertEquals(0, page.getOffset());
+        assertEquals(0, page.getResults().size());
     }
 
     @Test
     public void getOrders_userNotExist() throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get("/users/{userId}/orders", 100);
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.limit", notNullValue()))
-                .andExpect(jsonPath("$.offset", notNullValue()))
-                .andExpect(jsonPath("$.total", notNullValue()))
-                .andExpect(jsonPath("$.results", hasSize(0)));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/users/{userId}/orders", 100)
+                .with(request -> {
+                    request.setAttribute("userLogin", userDao.getUserById(100));
+                    return request;
+                });
+
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("該使用者不存在!", errorMessage);
     }
 }

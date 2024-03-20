@@ -45,6 +45,13 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getOrders(OrderQueryParams orderQueryParams) {
 
+        // 檢查 User 是否存在
+        User user = userDao.getUserById(orderQueryParams.getUserId());
+        if(user == null) {
+            log.warn("該 user_id {} 不存在", orderQueryParams.getUserId());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "該使用者不存在!");
+        }
+
         List<Order> orderList = orderDao.getOrders(orderQueryParams);
 
         for(Order order : orderList) {
@@ -78,7 +85,7 @@ public class OrderServiceImpl implements OrderService {
 
         if(user == null) {
             log.warn("該 user_id {} 不存在",userId);
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "該使用者不存在!");
         }
 
         int totalAmount = 0;
@@ -91,11 +98,11 @@ public class OrderServiceImpl implements OrderService {
             //檢查 product 是否存在、庫存是否足夠
             if(product == null) {
                 log.warn("商品 {} 不存在", buyItem.getProductId());
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "該商品不存在!");
             }
             else if(buyItem.getQuantity() > product.getStock()) {
                 log.warn("商品 {} 庫存不足，欲購買數量為 {} , 庫存數量為 {}", product.getProductName(), buyItem.getQuantity(), product.getStock());
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "該商品庫存不足!");
             }
 
             // 扣除商品庫存

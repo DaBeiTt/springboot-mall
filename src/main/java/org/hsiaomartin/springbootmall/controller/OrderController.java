@@ -78,12 +78,10 @@ public class OrderController {
 
     @PostMapping("/users/{userId}/orders")
     public String createOrder(@PathVariable Integer userId,
-                              @ModelAttribute @Valid CreateOrderRequest createOrderRequest,
+                              @Valid CreateOrderRequest createOrderRequest,
                               Model model) {
 
-        Integer orderId = orderService.createOrder(userId, createOrderRequest);
-
-        Order order = orderService.getOrderById(orderId);
+        orderService.createOrder(userId, createOrderRequest);
 
         SuccessObject successObject = new SuccessObject("createOrder", "訂單新增成功!");
         model.addAttribute("success", successObject);
