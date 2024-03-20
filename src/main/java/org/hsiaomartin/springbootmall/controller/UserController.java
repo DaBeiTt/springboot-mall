@@ -7,6 +7,8 @@ import org.hsiaomartin.springbootmall.dto.UserRegisterRequest;
 import org.hsiaomartin.springbootmall.model.User;
 import org.hsiaomartin.springbootmall.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +22,8 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/users/register")
-    public String register(@ModelAttribute @Valid UserRegisterRequest userRegisterRequest,
-                           Model model) {
+    public String register(@Valid UserRegisterRequest userRegisterRequest,
+                                   Model model) {
 
         userService.register(userRegisterRequest);
 
@@ -32,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/users/login")
-    public String login(@ModelAttribute @Valid UserLoginRequest userLoginRequest,
+    public String login(@Valid UserLoginRequest userLoginRequest,
                         Model model) {
 
         User user = userService.login(userLoginRequest);

@@ -5,20 +5,20 @@ import org.hsiaomartin.springbootmall.dao.UserDao;
 import org.hsiaomartin.springbootmall.dto.UserLoginRequest;
 import org.hsiaomartin.springbootmall.dto.UserRegisterRequest;
 import org.hsiaomartin.springbootmall.model.User;
+import org.hsiaomartin.springbootmall.util.SuccessObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -35,23 +35,26 @@ public class UserControllerTest {
     // 註冊新帳號
     @Test
     public void register_success() throws Exception {
+
         UserRegisterRequest userRegisterRequest = new UserRegisterRequest();
         userRegisterRequest.setEmail("test1@gmail.com");
-        userRegisterRequest.setPassword("123");
-
-        String json = objectMapper.writeValueAsString(userRegisterRequest);
+        userRegisterRequest.setPassword("test1");
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userRegisterRequest.getEmail())
+                .param("password", userRegisterRequest.getPassword());
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201))
-                .andExpect(jsonPath("$.userId", notNullValue()))
-                .andExpect(jsonPath("$.e_mail", equalTo("test1@gmail.com")))
-                .andExpect(jsonPath("$.createdDate", notNullValue()))
-                .andExpect(jsonPath("$.lastModifiedDate", notNullValue()));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(model().attributeExists("success"))
+                .andExpect(status().is(200))
+                .andExpect(view().name("message/success"))
+                .andReturn();
+
+        SuccessObject successObject = (SuccessObject) mvcResult.getModelAndView().getModel().get("success");
+        assertEquals("register", successObject.getEvent());
+        assertEquals("註冊成功！", successObject.getMessage());
 
         // 檢查資料庫中的密碼不為明碼
         User user = userDao.getUserByEmail(userRegisterRequest.getEmail());
@@ -64,12 +67,11 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("3gd8e7q34l9");
         userRegisterRequest.setPassword("123");
 
-        String json = objectMapper.writeValueAsString(userRegisterRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userRegisterRequest.getEmail())
+                .param("password", userRegisterRequest.getPassword());
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
@@ -82,19 +84,27 @@ public class UserControllerTest {
         userRegisterRequest.setEmail("test2@gmail.com");
         userRegisterRequest.setPassword("123");
 
-        String json = objectMapper.writeValueAsString(userRegisterRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userRegisterRequest.getEmail())
+                .param("password", userRegisterRequest.getPassword());
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(status().is(200))
+                .andReturn();
+
+        SuccessObject successObject = (SuccessObject) mvcResult.getModelAndView().getModel().get("success");
+        assertEquals("register", successObject.getEvent());
+        assertEquals("註冊成功！", successObject.getMessage());
 
         // 再次使用同個 email 註冊
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("此郵件已被註冊 !", errorMessage);
     }
 
     // 登入
@@ -112,19 +122,16 @@ public class UserControllerTest {
         userLoginRequest.setEmail(userRegisterRequest.getEmail());
         userLoginRequest.setPassword(userRegisterRequest.getPassword());
 
-        String json = objectMapper.writeValueAsString(userRegisterRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userLoginRequest.getEmail())
+                .param("password", userLoginRequest.getPassword());
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().is(200))
-                .andExpect(jsonPath("$.userId", notNullValue()))
-                .andExpect(jsonPath("$.e_mail", equalTo(userRegisterRequest.getEmail())))
-                .andExpect(jsonPath("$.createdDate", notNullValue()))
-                .andExpect(jsonPath("$.lastModifiedDate", notNullValue()));
+                .andExpect(status().is(302))
+                .andExpect(view().name("redirect:/products"));
+
     }
 
     @Test
@@ -141,15 +148,18 @@ public class UserControllerTest {
         userLoginRequest.setEmail(userRegisterRequest.getEmail());
         userLoginRequest.setPassword("unknown");
 
-        String json = objectMapper.writeValueAsString(userLoginRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userLoginRequest.getEmail())
+                .param("password", userLoginRequest.getPassword());
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("郵件地址或密碼錯誤 !", errorMessage);
     }
 
     @Test
@@ -158,12 +168,11 @@ public class UserControllerTest {
         userLoginRequest.setEmail("hkbudsr324");
         userLoginRequest.setPassword("123");
 
-        String json = objectMapper.writeValueAsString(userLoginRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userLoginRequest.getEmail())
+                .param("password", userLoginRequest.getPassword());
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().is(400));
@@ -175,26 +184,29 @@ public class UserControllerTest {
         userLoginRequest.setEmail("unknown@gmail.com");
         userLoginRequest.setPassword("123");
 
-        String json = objectMapper.writeValueAsString(userLoginRequest);
-
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userLoginRequest.getEmail())
+                .param("password", userLoginRequest.getPassword());
 
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().is(400));
+        MvcResult mvcResult = mockMvc.perform(requestBuilder)
+                .andExpect(view().name("message/error"))
+                .andReturn();
+
+        String errorMessage = (String) mvcResult.getModelAndView().getModel().get("errorMessage");
+        assertEquals("郵件地址或密碼錯誤 !", errorMessage);
     }
 
     private void register(UserRegisterRequest userRegisterRequest) throws Exception {
-        String json = objectMapper.writeValueAsString(userRegisterRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
                 .post("/users/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("email", userRegisterRequest.getEmail())
+                .param("password", userRegisterRequest.getPassword());
 
         mockMvc.perform(requestBuilder)
-                .andExpect(status().is(201));
+                .andExpect(status().is(200));
     }
 }
