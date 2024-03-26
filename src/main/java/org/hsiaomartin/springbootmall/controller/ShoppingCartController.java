@@ -33,7 +33,7 @@ public class ShoppingCartController {
     }
 
     @PostMapping("cart/add")
-    public String addCartItem(@ModelAttribute BuyItem buyItem) {
+    public String addCartItem(BuyItem buyItem) {
 
         CartItem cartItem = new CartItem();
         cartItem.setProduct(productService.getProductById(buyItem.getProductId()));
