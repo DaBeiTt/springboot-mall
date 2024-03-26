@@ -135,6 +135,15 @@ public class OrderServiceImpl implements OrderService {
 
         orderDao.deleteOrderById(orderId);
 
+        // 將產品庫存補回原數量
+        List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+
+        for(OrderItem item : orderItemList) {
+            Integer productId = item.getProductId();
+            Integer stock = productDao.getProductById(productId).getStock();
+            productDao.updateStock(productId, item.getQuantity() + stock);
+        }
+
         orderDao.deleteOrderItemsByOrderId(orderId);
     }
 }
