@@ -10,7 +10,7 @@ INSERT INTO product (product_name, category, image_url, price, stock, descriptio
 -- user
 INSERT INTO `user` (email, password, created_date, last_modified_date) VALUES ('user1@gmail.com', '202cb962ac59075b964b07152d234b70', '2022-06-30 10:30:00', '2022-06-30 10:30:00');
 INSERT INTO `user` (email, password, created_date, last_modified_date) VALUES ('user2@gmail.com', '202cb962ac59075b964b07152d234b70', '2022-06-30 10:40:00', '2022-06-30 10:40:00');
-INSERT INTO `user` (email, password, created_date, last_modified_date) VALUES ('test1@gmail.com', '5a105e8b9d40e1329780d62ea2265d8a', '2022-06-30 10:30:00', '2022-06-30 10:30:00');
+INSERT INTO `user` (email, password, created_date, last_modified_date) VALUES ('user3@gmail.com', '202cb962ac59075b964b07152d234b70', '2022-06-30 10:40:00', '2022-06-30 10:40:00');
 
 -- order, order_item
 INSERT INTO `order` (user_id, total_amount, created_date, last_modified_date) VALUES (1, 500690, '2022-06-30 11:10:00', '2022-06-30 11:10:00');

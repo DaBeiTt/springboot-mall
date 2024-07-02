@@ -18,6 +18,7 @@
     <p th:text="${errorMessage}"></p>
     <p th:if="${errorMessage == null}">錯誤</p>
     <a href="#" onclick="history.back();">返回</a>
+    <a th:if="${errorMessage == '該 email 尚未註冊 !'}" href="/registerPage">去註冊</a>
 </div>
 </body>
 </html>
