@@ -10,9 +10,7 @@ public class MyExceptionHandler {
 
     @ExceptionHandler(ResponseStatusException.class)
     public String handleResponseStatusException(ResponseStatusException e, Model model) {
-
         model.addAttribute("errorMessage", e.getReason());
-
         return "message/error";
     }
 }
